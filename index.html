@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finchy Bingo 🍾</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    // ── YOUR WORD LIST (min 25) ────────────────────────────
+    const WORDS = [
+    '"פאק פייס"',
+    'תנוחת סקס חשמלית',
+    'קול של דינוזאוררר',
+    'קולות של נשיקה סוטה',
+    'רפרור ל-וולדמורט',
+    '"הו פאק מן"',
+    '"בשנת 1832 שקר כלשהו"',
+    '"רפובליקת בננות"',
+    '"אני ואראל מוזמנים"',
+    '"אל תהיה לי אביאור/אופיר"',
+    '"מאדרפאקר"',
+    'זונה ממין זכר',
+    'רפרור לסבתא מזל',
+    'זיון באוויר',
+    '"עבדתי מלא השבוע"',
+    'רפרור ל-fallout',
+    'רפרור נגד יותם ופלקס',
+    'מילה שאף אחד לא מכיר',
+    '"טוב ביזו"',
+    '"טוב אתה לא עוזר"',
+    '"צו פאפי מונאניו"',
+    '"אתה מעייף אותי"',
+    '"איפה הזונות?"',
+    'להגיד שמייפל חמודה/מתוקה',
+    '"יותם/דור/נועם כזה סקסי"',
+    '"יש לי זין בינוני"',
+    'ללקק כוס בין האצבעות',
+    'משהו שקשור ללהשתין במזוודה',
+    'להתחרט שהוא מתחתן',
+    '"אתם המשרתים שלי"',
+    'להקיא',
+    'להכנס לבריכה עם בגדים',
+    'לשבור משהו',
+    'להפיל אוכל לרצפה',
+    'למעוד בטעות-לא להפיל אותו!',
+    'פנתומימה של למצוץ זין',
+    'לשתות אחרי שאמר שלא ישתה יותר',
+    '"תחליש/ו את המוזיקה"',
+    'לחשוף את התחת',
+    'לגעת בפטמות',
+    'לנצח בתחרות שחייה',
+    'לבקש סליחה כשהוא שיכור',
+    '"אני אוהב אתכם"',
+    'לומר למישהו שהוא טועה/לתקן אותו',
+    'לשאת נאום',
+    'לצחוק מבדיחה לא מצחיקה כי כולם צוחקים',
+    'לעשות חיקוי של אחד הנוכחים',
+    '"למה דווקא אני?"',
+    'לראיין/להתראייין לפודקאסט',
+    'לדבר עם חפץ',
+    'לדבר על עצמו בגוף שלישי',
+    'לחזור על משפט 3 פעמים',
+    'לנבא את העתיד',
+    'גיטרה - pumped up kicks',
+    'לשתות שוט מפופיק',
+    'לתת סטירה למישהו',
+    'להקליט לאראל הודעה מינית',
+    'סטריפ דנס',
+    'לנשק צרפתית חפץ',
+    'צאג בירה',
+    'לנצח בלימבו',
+    'להשתין לא בשירותים',
+    'לעשות שק קמח',
+    'לתת 3 טיפים לזוגיות לאורך הערב',
+    '"בקטריה ממין זונה"',
+    '"פאק דה סיסטם"',
+    'מנצח את אריה בפינגפונג',
+    'מכניס את הכדור הלבן',
+    'לשיר מזרחית בקריוקי',
+    '"מח של מיקרוב"',
+    '"איי איי קפטן"',
+    '"את זונה כלבבי"',
+    '"נבלה"',
+    '"ויברטוק מקצר"',
+    '"ילדה רוצה סוכריה?"',
+    'לעשות טוורק',
+    'לעשות פריסטייל',
+    '"אבל בדיוק התיישבתי!"',
+    '"תבקש מדור"',
+    'לפמפם למישהו את הראש',
+    'לדרג את הנוכחים לפי סולם כלשהו',
+    'לדבר במבטא ערבי',
+    ];
+
+    // ── WELCOME MESSAGE shown on the join screen ───────────
+    const WELCOME_TITLE   = "Welcome to Finchy's Bingo! 🎉";
+    const WELCOME_MESSAGE = `ברוכים הבאים למשחק הבינגו של פינצ'י!
+      כאשר בעל השמחה מבצע את אחד מהריבועים בלוח שלכם *מרצונו החופשי!* סמנו את אותו הריבוע.
+      אם הטקסט שבריבוע עטוף בגרשיים, על פינצ'י לומר את הטקסט במדויק, אלכסונים לא נחשבים - רק שורה או טור. והכי חשוב, תהיו חשאיים!`;
+
+    // ── WIN SOUND URL (.mp3 / .wav) or "" for none ─────────
+    const WIN_SOUND_URL = "https://res.cloudinary.com/dmgeq70zx/video/upload/v1777647794/winner_sound_qoxllw.mp3";
+
+    // ── LOSE SOUND URL played for everyone else when someone wins
+    const LOSE_SOUND_URL = "https://res.cloudinary.com/dmgeq70zx/video/upload/v1777631380/looser_sound_oq8tie.mp3";
+
+    // ── MESSAGE shown when someone wins ───────────────────
+    const WIN_MESSAGE = "Well done! Finchmeister commands to get that man a drink!";
+
+    // ── MESSAGE shown to losers — use {winner} as placeholder
+    const LOSE_MESSAGE = "{winner} Won! get that man a drink!";
+
+    // ── IMAGE on the register/join screen ────────────────
+    const REGISTER_IMAGE_URL = "https://res.cloudinary.com/dmgeq70zx/image/upload/v1777627336/stripper_efe6an.jpg";
+
+    // ── IMAGE on the board screen ────────────────────────
+    const BOARD_IMAGE_URL = "https://res.cloudinary.com/dmgeq70zx/image/upload/v1777627337/tits_dvo4rq.png";
+
+    // ── FIREBASE CONFIG ────────────────────────────────────
+    const FIREBASE_CONFIG = {
+      apiKey:            "AIzaSyAK5Mjz0WbT2SY6rw0QsMcTZx2_jRsU0gc",
+      authDomain:        "finchybingo.firebaseapp.com",
+      databaseURL:       "https://finchybingo-default-rtdb.firebaseio.com",
+      projectId:         "finchybingo",
+      storageBucket:     "finchybingo.firebasestorage.app",
+      messagingSenderId: "393041218038",
+      appId:             "1:393041218038:web:10bf03a98ab1e111c2dfd7"
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg:         #0d0d0d;
+      --bg2:        #1a1a1a;
+      --bg3:        #242424;
+      --border:     #333;
+      --border2:    #444;
+      --text:       #f0f0f0;
+      --text2:      #aaa;
+      --text3:      #666;
+      --pink:       #ff2d78;
+      --pink-dark:  #c41f5e;
+      --pink-glow:  rgba(255,45,120,0.18);
+      --gold:       #ffd700;
+      --gold-dim:   rgba(255,215,0,0.12);
+      --green:      #00c47a;
+      --green-dim:  rgba(0,196,122,0.15);
+      --red:        #ff4444;
+      --red-dim:    rgba(255,68,68,0.12);
+      --radius:     8px;
+      --font-head:  'Bebas Neue', Impact, sans-serif;
+      --font-body:  'DM Sans', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    .screen { display: none; width: 100%; max-width: 520px; padding: 2rem 1.25rem 5rem; position: relative; z-index: 1; margin: 0 auto; }
+    .screen.active { display: block; }
+
+    /* ── hero ── */
+    .hero { text-align: center; padding: 2.5rem 0 2rem; }
+    .hero-emoji {
+      font-size: 64px; display: block; margin-bottom: 0.75rem;
+      filter: drop-shadow(0 0 20px rgba(255,45,120,0.6));
+      animation: float 3s ease-in-out infinite;
+    display: flex; justify-content: center;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: 3.8rem; letter-spacing: 0.05em; line-height: 1;
+      background: linear-gradient(135deg, #ff2d78, #ffd700);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.3rem;
+    }
+    .hero-sub { font-size: 13px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; }
+
+    /* ── welcome card ── */
+    .welcome-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-left: 3px solid var(--pink);
+      border-radius: var(--radius); padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .welcome-card h3 { font-size: 14px; font-weight: 700; color: var(--pink); margin-bottom: 6px; }
+    .welcome-card p  { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+    /* ── name card ── */
+    .name-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+    }
+    .name-card label {
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text3); display: block; margin-bottom: 8px;
+    }
+    .name-card input {
+      width: 100%; padding: 11px 14px;
+      font-family: var(--font-body); font-size: 15px;
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: var(--radius); color: var(--text); outline: none;
+      margin-bottom: 1rem; transition: border-color 0.15s;
+    }
+    .name-card input:focus { border-color: var(--pink); }
+    .name-card input::placeholder { color: var(--text3); }
+    .error-msg { font-size: 12px; color: var(--red); margin-top: 8px; display: none; }
+
+    /* ── buttons ── */
+    .btn {
+      display: inline-block; padding: 11px 20px;
+      font-family: var(--font-body); font-size: 13px; font-weight: 600;
+      border: 1px solid var(--border2); border-radius: var(--radius);
+      background: transparent; color: var(--text);
+      cursor: pointer; transition: all 0.15s; letter-spacing: 0.02em;
+    }
+    .btn:hover { border-color: var(--text2); background: var(--bg3); }
+    .btn-pink {
+      background: var(--pink); color: #fff; border-color: var(--pink);
+      width: 100%; text-align: center;
+      box-shadow: 0 0 20px rgba(255,45,120,0.35);
+    }
+    .btn-pink:hover { background: var(--pink-dark); border-color: var(--pink-dark); box-shadow: 0 0 30px rgba(255,45,120,0.5); }
+    .btn-red { border-color: var(--red); color: var(--red); }
+    .btn-red:hover { background: var(--red); color: #fff; }
+
+    /* ── topbar ── */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.25rem; padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-name {
+      font-family: var(--font-head); font-size: 1.6rem; letter-spacing: 0.04em;
+      background: linear-gradient(135deg, #ff2d78, #ffd700);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .topbar-count { font-size: 11px; letter-spacing: 0.08em; color: var(--text3); text-transform: uppercase; margin-top: 2px; }
+    .conn-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--text3); margin-right: 5px; vertical-align: middle; transition: background 0.3s; }
+    .conn-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .conn-dot.error  { background: var(--red); }
+    .conn-status { font-size: 11px; color: var(--text3); }
+
+    /* ── bingo board ── */
+    .bingo-letters { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; text-align: center; width: 100%; }
+    .bingo-letters span {
+      font-family: var(--font-head); font-size: 1.6rem; letter-spacing: 0.05em;
+      color: var(--gold); text-shadow: 0 0 12px rgba(255,215,0,0.5);
+    }
+
+    .bingo-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 1.25rem; width: 100%; }
+    .cell {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 4px;
+      font-size: 10px; line-height: 1.2; font-weight: 500;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); cursor: pointer;
+      transition: all 0.12s; user-select: none; color: var(--text2);
+    }
+    .cell:hover:not(.free):not(.win) { border-color: var(--pink); color: var(--text); background: var(--bg3); }
+    .cell:active:not(.free) { transform: scale(0.93); }
+    .cell.marked {
+      background: var(--bg3); border-color: var(--border2); color: var(--text3);
+      text-decoration: line-through; text-decoration-color: var(--text3);
+    }
+    .cell.win {
+      background: var(--green-dim); border-color: var(--green); color: var(--green);
+      font-weight: 700; box-shadow: 0 0 10px rgba(0,196,122,0.3);
+    }
+    .cell.free {
+      background: var(--gold-dim); border-color: var(--gold); color: var(--gold);
+      font-size: 9px; cursor: default; font-weight: 700;
+      box-shadow: 0 0 10px rgba(255,215,0,0.2);
+    }
+
+    /* ── win banner ── */
+    .win-banner {
+      display: none;
+      background: linear-gradient(135deg, rgba(255,45,120,0.15), rgba(255,215,0,0.1));
+      border: 1px solid var(--pink);
+      border-radius: var(--radius); padding: 1.25rem; text-align: center;
+      margin-bottom: 1.25rem; animation: pop 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 0 30px rgba(255,45,120,0.25);
+    }
+    .win-banner h2 {
+      font-family: var(--font-head); font-size: 2.5rem; letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #ff2d78, #ffd700);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 4px;
+    }
+    .win-banner p { font-size: 13px; color: var(--text2); }
+    @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    /* ── lose banner ── */
+    .lose-banner {
+      background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,68,68,0.1));
+      border: 1px solid var(--gold);
+      border-radius: var(--radius); padding: 1rem 1.25rem; text-align: center;
+      margin-bottom: 1.25rem; animation: pop 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 0 20px rgba(255,215,0,0.15);
+    }
+    .lose-banner p { font-size: 15px; font-weight: 700; color: var(--gold); }
+
+    /* ── leaderboard ── */
+    .section-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+    .leaderboard { display: flex; flex-direction: column; gap: 6px; }
+    .lb-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: var(--bg2);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      transition: border-color 0.2s;
+    }
+    .lb-row.me     { border-color: var(--pink); background: var(--pink-glow); }
+    .lb-row.winner { border-color: var(--green); background: var(--green-dim); }
+    .lb-name  { font-size: 14px; font-weight: 600; }
+    .lb-score { font-size: 12px; color: var(--text3); }
+    .lb-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 99px;
+      background: var(--green-dim); color: var(--green);
+      font-weight: 700; letter-spacing: 0.04em; margin-left: 6px;
+      border: 1px solid var(--green);
+    }
+    .lb-badge.you { background: var(--pink-glow); color: var(--pink); border-color: var(--pink); }
+
+    .divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+
+    /* ── admin panel ── */
+    .admin-panel {
+      margin-top: 2rem; padding: 1.25rem;
+      background: var(--red-dim); border: 1px solid rgba(255,68,68,0.3);
+      border-radius: var(--radius);
+    }
+    .admin-panel h3 { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+    .admin-panel p  { font-size: 12px; color: var(--text2); margin-bottom: 12px; line-height: 1.6; }
+
+    /* ── modal ── */
+    .modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 100;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: var(--radius); padding: 1.75rem;
+      max-width: 340px; width: 90%; text-align: center;
+    }
+    .modal h3 { font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 0.04em; margin-bottom: 10px; color: var(--red); }
+    .modal p  { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; line-height: 1.6; }
+    .modal-btns { display: flex; gap: 10px; justify-content: center; }
+
+    /* ── tabs ── */
+    .tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
+    .tab-btn {
+      flex: 1; padding: 10px; font-family: var(--font-body); font-size: 13px; font-weight: 600;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      color: var(--text3); cursor: pointer; transition: all 0.15s;
+    }
+    .tab-btn:hover { border-color: var(--border2); color: var(--text); }
+    .tab-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; box-shadow: 0 0 14px rgba(255,45,120,0.35); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── marked words list ── */
+    .marked-word-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; margin-bottom: 6px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 13px;
+    }
+    .marked-word-item.on-my-board { border-color: var(--green); color: var(--green); }
+    .marked-word-item .word-num { font-size: 11px; color: var(--text3); margin-right: 8px; }
+    .marked-word-item .word-who { font-size: 11px; color: var(--text3); }
+
+    /* ── no words warning ── */
+    .no-words-warn {
+      background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.3);
+      border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem;
+      font-size: 13px; color: var(--gold); text-align: center; line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAME SCREEN -->
+<div id="screen-name" class="screen active">
+  <div class="hero">
+    <div class="hero-emoji" id="register-img-wrap" style="display:flex;justify-content:center;min-height:80px;"></div>
+    <h1>Finchy Bingo</h1>
+    <p class="hero-sub">bachelor party edition</p>
+  </div>
+
+  <div id="no-words-warn" class="no-words-warn" style="display:none;">
+    ⚠️ Word list is empty — add your words to the <code>WORDS</code> array in the file before playing.
+  </div>
+
+  <div id="welcome-card" class="welcome-card" style="display:none;">
+    <h3 id="welcome-title"></h3>
+    <p id="welcome-msg"></p>
+  </div>
+
+  <div class="name-card">
+    <label>Your name</label>
+    <input type="text" id="name-input" placeholder="e.g. Danny Boy" maxlength="20"
+           onkeydown="if(event.key==='Enter') window.joinGame()" autofocus />
+    <button class="btn btn-pink" onclick="window.joinGame()">Let's go 🍾</button>
+    <p class="error-msg" id="name-error"></p>
+  </div>
+</div>
+
+<!-- BOARD SCREEN -->
+<div id="screen-board" class="screen">
+  <div class="topbar">
+    <div>
+      <div class="topbar-name" id="topbar-name">—</div>
+      <div class="topbar-count" id="topbar-count">0 / 24 marked</div>
+    </div>
+    <div style="text-align:right;">
+      <span class="conn-dot" id="conn-dot"></span><span class="conn-status" id="conn-status">connecting</span>
+    </div>
+  </div>
+
+  <div class="win-banner" id="win-banner">
+    <h2>🎉 BINGO! 🎉</h2>
+    <p id="win-msg"></p>
+  </div>
+
+  <div class="lose-banner" id="lose-banner" style="display:none;">
+    <p id="lose-msg"></p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-btn-board" onclick="window.switchTab('board-tab',this)">🎯 Board</button>
+    <button class="tab-btn" id="tab-btn-lads" onclick="window.switchTab('players-tab',this)">🍺 Lads</button>
+    <button class="tab-btn" id="tab-btn-words" onclick="window.switchTab('words-tab',this)">📋 Words</button>
+  </div>
+  <div id="board-tab" class="tab-panel active" style="display:flex;flex-direction:column;align-items:center;">
+    <div id="board-img-wrap" style="text-align:center;margin-bottom:0.75rem;min-height:60px;"></div>
+    <div class="bingo-letters"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span><span>!</span><span>🍾</span></div>
+    <div class="bingo-grid" id="bingo-grid"></div>
+  </div>
+  <div id="players-tab" class="tab-panel" style="display:none;">
+    <div class="leaderboard" id="leaderboard"></div>
+  </div>
+  <div id="words-tab" class="tab-panel" style="display:none;">
+    <div class="section-label" style="margin-bottom:10px;">words marked so far</div>
+    <div id="marked-words-list"></div>
+  </div>
+
+  <div class="admin-panel" id="admin-panel" style="display:none;">
+    <h3>⚠️ admin</h3>
+    <p>Wipe all player data and start fresh. This cannot be undone — everyone gets kicked back to the name screen.</p>
+    <button class="btn btn-red" onclick="window.confirmReset()">Reset game →</button>
+  </div>
+</div>
+
+<!-- Reset modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h3>Reset?</h3>
+    <p>All player data will be wiped. Everyone goes back to the start. Sure about that?</p>
+    <div class="modal-btns">
+      <button class="btn" onclick="document.getElementById('modal-bg').classList.remove('open')">Cancel</button>
+      <button class="btn btn-red" onclick="window.doReset()">Yep, nuke it</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp }                                      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, remove, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  // ── render images ───────────────────────────────────────────────
+  function makeImg(url, height) {
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.cssText = `height:${height}px;width:auto;object-fit:contain;filter:drop-shadow(0 0 12px rgba(255,45,120,0.5));animation:float 3s ease-in-out infinite;`;
+    return img;
+  }
+  if (REGISTER_IMAGE_URL) {
+    document.getElementById('register-img-wrap').appendChild(makeImg(REGISTER_IMAGE_URL, 140));
+  }
+  if (BOARD_IMAGE_URL) {
+    document.getElementById('board-img-wrap').appendChild(makeImg(BOARD_IMAGE_URL, 100));
+  }
+
+  // ── show welcome message if set ──────────────────────────────
+  if (WORDS.length === 0) {
+    document.getElementById('no-words-warn').style.display = 'block';
+  }
+  if (WELCOME_MESSAGE) {
+    document.getElementById('welcome-card').style.display = 'block';
+    document.getElementById('welcome-title').textContent = WELCOME_TITLE;
+    document.getElementById('welcome-msg').textContent   = WELCOME_MESSAGE;
+  }
+
+  // ── helpers ──────────────────────────────────────────────────
+  function seededShuffle(arr, seed) {
+    const a = [...arr];
+    let s = [...seed].reduce((h,c) => Math.imul(31,h) + c.charCodeAt(0)|0, 0x12345678);
+    const rng = () => { s^=s<<13; s^=s>>17; s^=s<<5; return (s>>>0)/0xffffffff; };
+    for (let i=a.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+  function makeBoard(name) {
+    const w = seededShuffle(WORDS, name).slice(0,48);
+    w.splice(24,0,"FREE"); return w; // true center of 7x7 is index 24
+  }
+  function winLine(board, marked) {
+    const ok = i => board[i]==="FREE" || marked.includes(board[i]);
+    for(let r=0;r<7;r++){ const l=[0,1,2,3,4,5,6].map(c=>r*7+c); if(l.every(ok)) return l; }
+    for(let c=0;c<7;c++){ const l=[0,1,2,3,4,5,6].map(r=>r*7+c); if(l.every(ok)) return l; }
+    return [];
+  }
+  // returns how many unmarked squares away the player is from their closest line
+  function getClosestLineDistance(board, marked) {
+    const ok = i => board[i]==="FREE" || marked.includes(board[i]);
+    let min = 7;
+    for(let r=0;r<7;r++){
+      const missing = [0,1,2,3,4,5,6].map(c=>r*7+c).filter(i=>!ok(i)).length;
+      if(missing < min) min = missing;
+    }
+    for(let c=0;c<7;c++){
+      const missing = [0,1,2,3,4,5,6].map(r=>r*7+c).filter(i=>!ok(i)).length;
+      if(missing < min) min = missing;
+    }
+    return min;
+  }
+
+  function safeName(n) { return n.replace(/[.#$[\]/]/g,'_'); }
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function setConn(cls, txt) {
+    document.getElementById('conn-dot').className = 'conn-dot '+cls;
+    document.getElementById('conn-status').textContent = txt;
+  }
+
+  // ── state ────────────────────────────────────────────────────
+  let db, myName, myBoard, allPlayers = {}, markedWords = [], winSoundPlayed = false, loseSoundPlayed = false;
+  const LS = 'bingo_name';
+  const IS_ADMIN = location.search.includes('admin');
+
+  // ── render board ─────────────────────────────────────────────
+  function getMyMarked() {
+    return myBoard.filter(w => w !== "FREE" && markedWords.includes(w));
+  }
+
+  function renderBoard() {
+    const myMarked = getMyMarked();
+    const closestLine = getClosestLineDistance(myBoard, myMarked);
+    const wl = winLine(myBoard, myMarked);
+    const won = wl.length > 0;
+
+    const otherWinner = Object.values(allPlayers).find(p => {
+      const b = makeBoard(p.name);
+      const m = b.filter(w => w !== "FREE" && markedWords.includes(w));
+      return p.name !== myName && winLine(b, m).length > 0;
+    });
+
+    document.getElementById('win-banner').style.display = won ? 'block' : 'none';
+    document.getElementById('lose-banner').style.display = (!won && otherWinner) ? 'block' : 'none';
+    document.getElementById('topbar-count').textContent = myMarked.length + ' / 48 marked · ' + closestLine + ' away from winning';
+
+    if (won && !winSoundPlayed) {
+      if (WIN_SOUND_URL) try { new Audio(WIN_SOUND_URL).play(); } catch(e) {}
+      winSoundPlayed = true;
+    }
+    if (!won && otherWinner && !loseSoundPlayed) {
+      if (LOSE_SOUND_URL) try { new Audio(LOSE_SOUND_URL).play(); } catch(e) {}
+      loseSoundPlayed = true;
+    }
+
+    document.getElementById('win-msg').textContent = WIN_MESSAGE;
+    if (otherWinner) {
+      document.getElementById('lose-msg').textContent = LOSE_MESSAGE.replace('{winner}', otherWinner.name);
+    }
+    document.getElementById('bingo-grid').innerHTML = myBoard.map((w,i) => {
+      const free = w === "FREE", win = wl.includes(i), marked = free || myMarked.includes(w);
+      const cls = 'cell' + (free?' free' : win?' win' : marked?' marked' : '');
+      return `<div class="${cls}" ${free ? '' : `onclick="window._toggle('${esc(w)}')" `}>${esc(w)}</div>`;
+    }).join('');
+  }
+
+  // ── render marked words list ─────────────────────────────────
+  function renderMarkedWords() {
+    const el = document.getElementById('marked-words-list');
+    if (markedWords.length === 0) {
+      el.innerHTML = '<div style="font-size:13px;color:var(--text3);">No words marked yet…</div>';
+      return;
+    }
+    el.innerHTML = markedWords.map((w, i) => {
+      const onMyBoard = myBoard.includes(w);
+      return `<div class="marked-word-item${onMyBoard ? ' on-my-board' : ''}">
+        <span><span class="word-num">#${i+1}</span>${esc(w)}</span>
+        ${onMyBoard ? '<span style="font-size:10px;color:var(--green);">✓ on your board</span>' : '<span style="font-size:10px;color:var(--text3);">not on your board</span>'}
+      </div>`;
+    }).reverse().join(''); // newest first
+  }
+
+  // ── render leaderboard ───────────────────────────────────────
+  function renderLeaderboard() {
+    const rows = Object.values(allPlayers).map(p => ({
+      name: p.name,
+      count: (() => { const b=makeBoard(p.name); return b.filter(w=>w!=="FREE"&&markedWords.includes(w)).length; })(),
+      closest: (() => { const b=makeBoard(p.name); const m=b.filter(w=>w!=="FREE"&&markedWords.includes(w)); return getClosestLineDistance(b,m); })(),
+      won: (() => { const b=makeBoard(p.name); const m=b.filter(w=>w!=="FREE"&&markedWords.includes(w)); return winLine(b,m).length>0; })()
+    })).sort((a,b) => a.closest - b.closest || b.count - a.count);
+
+    document.getElementById('leaderboard').innerHTML = rows.length === 0
+      ? '<div style="font-size:13px;color:var(--text3);">Nobody here yet…</div>'
+      : rows.map((p, i) => {
+          const me = p.name === myName;
+          const medal = i === 0 ? '🥇 ' : i === 1 ? '🥈 ' : i === 2 ? '🥉 ' : '';
+          const cls = 'lb-row' + (p.won?' winner' : me?' me' : '');
+          return `<div class="${cls}">
+            <div>
+              <span class="lb-name">${medal}${esc(p.name)}</span>
+              ${me ? '<span class="lb-badge you">you</span>' : ''}
+              ${p.won ? '<span class="lb-badge">BINGO!</span>' : ''}
+            </div>
+            <span class="lb-score">${p.count} / 48 &nbsp;·&nbsp; ${p.won ? "winner" : p.closest + " away"}</span>
+          </div>`;
+        }).join('');
+  }
+
+  // ── toggle cell ──────────────────────────────────────────────
+  window._toggle = function(word) {
+    const idx = markedWords.indexOf(word);
+    if (idx === -1) {
+      const newList = [...markedWords, word];
+      if (db) set(ref(db, 'markedWords'), Object.fromEntries(newList.map((w,i)=>[i,w])));
+    } else {
+      const newList = markedWords.filter(w => w !== word);
+      if (db) set(ref(db, 'markedWords'), newList.length ? Object.fromEntries(newList.map((w,i)=>[i,w])) : null);
+    }
+  };
+
+  // ── admin reset ──────────────────────────────────────────────
+  window.switchTab = function(showId, btn) {
+    ['board-tab','players-tab','words-tab'].forEach(id => {
+      const el = document.getElementById(id);
+      el.style.display = id === showId ? 'block' : 'none';
+      el.classList.toggle('active', id === showId);
+    });
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+
+  window.confirmReset = () => document.getElementById('modal-bg').classList.add('open');
+  window.doReset = async function() {
+    document.getElementById('modal-bg').classList.remove('open');
+    if (!db) return;
+    await remove(ref(db, 'players'));
+    await remove(ref(db, 'markedWords'));
+    localStorage.removeItem(LS);
+    location.reload();
+  };
+
+  // ── start game ───────────────────────────────────────────────
+  function startGame(name) {
+    myName = name;
+    myBoard = makeBoard(name);
+
+    document.getElementById('screen-name').classList.remove('active');
+    document.getElementById('screen-board').classList.add('active');
+    document.getElementById('topbar-name').textContent = name;
+
+    renderBoard();
+
+    if (IS_ADMIN) document.getElementById('admin-panel').style.display = 'block';
+
+    const app = initializeApp(FIREBASE_CONFIG);
+    db = getDatabase(app);
+    const myRef = ref(db, 'players/'+safeName(name));
+
+    // register player presence
+    onValue(myRef, snap => {
+      set(myRef, { name, lastSeen: Date.now() });
+      renderBoard();
+    }, { onlyOnce: true });
+
+    onValue(ref(db, 'players'), snap => {
+      allPlayers = snap.val() || {};
+      renderLeaderboard();
+      renderBoard();
+    });
+
+    // listen to global marked words
+    let prevMarkedCount = 0;
+    onValue(ref(db, 'markedWords'), snap => {
+      const newMarkedWords = snap.val() ? Object.values(snap.val()) : [];
+      // detect newly added word
+      if (newMarkedWords.length > prevMarkedCount) {
+        const addedWord = newMarkedWords[newMarkedWords.length - 1];
+  
+      }
+      prevMarkedCount = newMarkedWords.length;
+      markedWords = newMarkedWords;
+      renderBoard();
+      renderLeaderboard();
+      renderMarkedWords();
+    });
+
+    let playerWritten = false;
+    onValue(myRef, snap => {
+      if (!snap.exists() && playerWritten) {
+        localStorage.removeItem(LS);
+        myName = null;
+        location.reload();
+      }
+      if (snap.exists()) playerWritten = true;
+    });
+
+    onValue(ref(db, '.info/connected'), snap => {
+      setConn(snap.val() ? 'online' : 'error', snap.val() ? 'connected' : 'reconnecting…');
+    });
+  }
+
+  // ── join ─────────────────────────────────────────────────────
+  window.joinGame = async function() {
+    if (WORDS.length < 49) {
+      document.getElementById('name-error').textContent = 'Word list needs at least 49 words before playing.';
+      document.getElementById('name-error').style.display = 'block';
+      return;
+    }
+    const name = document.getElementById('name-input').value.trim();
+    const err  = document.getElementById('name-error');
+    const btn  = document.querySelector('.btn-pink');
+    if (!name) { err.textContent = 'Oi, what\'s your name?'; err.style.display = 'block'; return; }
+    err.style.display = 'none';
+
+    const savedName = localStorage.getItem(LS);
+    if (savedName !== name) {
+      btn.textContent = 'Checking…'; btn.disabled = true;
+      try {
+        const app2 = initializeApp(FIREBASE_CONFIG, 'check');
+        const snap = await get(ref(getDatabase(app2), 'players/'+safeName(name)));
+        if (snap.exists()) {
+          err.textContent = 'That name\'s taken mate — try another.';
+          err.style.display = 'block';
+          btn.textContent = 'Let\'s go 🍾'; btn.disabled = false;
+          return;
+        }
+      } catch(e) { /* allow through */ }
+      btn.textContent = 'Let\'s go 🍾'; btn.disabled = false;
+    }
+
+    localStorage.setItem(LS, name);
+    startGame(name);
+  };
+
+  // ── auto-join returning players ──────────────────────────────
+  const saved = localStorage.getItem(LS);
+  if (saved) {
+    document.getElementById('name-input').value = saved;
+    startGame(saved);
+  }
+</script>
+</body>
+</html>
