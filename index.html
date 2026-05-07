@@ -120,7 +120,8 @@
 
   // ── COMIC BUBBLE messages next to board image ─────────
     const WIN_BUBBLE  = "Oh you are the Finchmeister!\nnow please, go and fuck yourself!"; // shown to the winner
-    const LOSE_BUBBLE = "Such a looser, Finchy is now mad at you"; // shown to everyone else when someone wins    // ── FIREBASE CONFIG ────────────────────────────────────
+    const LOSE_BUBBLE = "Such a looser, Finchy is now mad at you"; // shown to everyone else when someone wins
+    // ── FIREBASE CONFIG ────────────────────────────────────
     const FIREBASE_CONFIG = {
       apiKey:            "AIzaSyAK5Mjz0WbT2SY6rw0QsMcTZx2_jRsU0gc",
       authDomain:        "finchybingo.firebaseapp.com",
@@ -735,12 +736,13 @@
   function startGame(name) {
     myName = name;
     myBoard = makeBoard(name);
+    markedWords = []; // always start clean — Firebase listener will populate
 
     document.getElementById('screen-name').classList.remove('active');
     document.getElementById('screen-board').classList.add('active');
     document.getElementById('topbar-name').textContent = name;
 
-    renderBoard();
+    renderBoard(); // renders empty board while Firebase loads
 
     if (IS_ADMIN) document.getElementById('admin-panel').style.display = 'block';
 
@@ -749,10 +751,7 @@
     const myRef = ref(db, 'players/'+safeName(name));
 
     // register player presence
-    onValue(myRef, snap => {
-      set(myRef, { name, lastSeen: Date.now() });
-      renderBoard();
-    }, { onlyOnce: true });
+    set(myRef, { name, lastSeen: Date.now() });
 
     onValue(ref(db, 'players'), snap => {
       allPlayers = snap.val() || {};
@@ -776,14 +775,16 @@
       renderMarkedWords();
     });
 
-    let playerWritten = false;
+    // detect game reset — if our player entry disappears after being confirmed written, reload
+    let playerConfirmed = false;
     onValue(myRef, snap => {
-      if (!snap.exists() && playerWritten) {
+      if (snap.exists()) {
+        playerConfirmed = true;
+      } else if (playerConfirmed) {
         localStorage.removeItem(LS);
         myName = null;
         location.reload();
       }
-      if (snap.exists()) playerWritten = true;
     });
 
     onValue(ref(db, '.info/connected'), snap => {
